@@ -1,7 +1,3 @@
-import json
-
-manifest = open("manifest.json", "r")
-
 import nativemessaging
 import plugpag
 import re
