@@ -1,6 +1,9 @@
 import nativemessaging
 import plugpag
 import re
+import update
+
+update();
 
 result = ''
 
