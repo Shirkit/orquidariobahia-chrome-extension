@@ -3,7 +3,7 @@ import plugpag
 import re
 import update
 
-update();
+update.update();
 
 result = ''
 
