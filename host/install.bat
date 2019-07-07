@@ -4,4 +4,5 @@
 
 :: Change HKCU to HKLM if you want to install globally.
 :: %~dp0 is the directory containing this bat script and ends with a backslash.
-REG ADD "HKCU\Software\Google\Chrome\NativeMessagingHosts\com.google.chrome.example.echo" /ve /t REG_SZ /d "%~dp0com.google.chrome.example.echo.json" /f
+REG ADD "HKCU\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /ve /t REG_SZ /d "%~dp0manifest.json" /f
+REG ADD "HKLM\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /ve /t REG_SZ /d "%~dp0manifest.json" /f

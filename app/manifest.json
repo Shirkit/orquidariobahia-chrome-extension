@@ -1,10 +1,8 @@
 {
-  // Extension ID: knldjmfmopnpolahpmmgbagdohdnhkik
-  "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB",
-  "name": "Orquidario Bahia Helper",
-  "version": "1.0",
+  "name": "Orquidario Bahia Helper App",
+  "version": "0.1.0",
   "manifest_version": 2,
-  "description": "Parses messages from the Orquidario Bahia.",
+  "description": "Send and parses messages from the Orquidario Bahia compainion app.",
   "content_scripts": [
     {
       "matches": [
@@ -19,7 +17,7 @@
     "persistent": false
   },
   "icons": {
-    "128": "icon-128.png"
+    "128": "icon.png"
   },
   "permissions": [
     "nativeMessaging", "activeTab", "background"

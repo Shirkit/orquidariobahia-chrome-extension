@@ -1,0 +1,18 @@
+// Copyright 2013 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+{
+  "manifest_version": 2,
+  "name": "br.com.orquidariobahia.companion",
+  "version": "0.1.0",
+  "description": "Native compaining app for Orquidario Bahia helper.",
+  "path": "start.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://blejmlgjkiefemelbggaackbadlajdhg/",
+    "chrome-extension://cpfjlhelpbolpadpoohaoopnljgbjage/"
+  ],
+  "icons": {
+    "128": "icon.png"
+  },
+}
