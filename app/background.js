@@ -1,4 +1,4 @@
-const hostName = "com.google.chrome.example.echo";
+const hostName = "br.com.orquidariobahia.companion";
 var native = null;
 var connection = null;
 

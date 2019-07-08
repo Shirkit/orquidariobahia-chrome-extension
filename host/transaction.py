@@ -3,6 +3,8 @@ import ctypes
 """
 Class to implement payment routines.
 """
+
+
 class Payment:
 
     USERREF = b'UserRef'
@@ -16,6 +18,7 @@ class Payment:
     plugPag: PlugPag library instance reference.
     encoding: Charset used to encode/decode strings.
     """
+
     def __init__(self, plugPag, values, encoding):
         self._lib = plugPag
         self._encoding = encoding
@@ -30,17 +33,19 @@ class Payment:
     transactionResult: TransactionResult to be filled with the transaction's result.
     return: Transaction status code.
     """
+
     def execute(self, transactionResult):
         return ctypes.c_int(self._lib.SimplePaymentTransaction(self._method,
-                                                              self._installaments,
-                                                              self._installaments,
-                                                              bytes(self._amount, self._encoding),
-                                                              Payment.USERREF,
-                                                              ctypes.byref(transactionResult)))
+                                                               self._installaments,
+                                                               self._installaments,
+                                                               bytes(self._amount, self._encoding),
+                                                               Payment.USERREF,
+                                                               ctypes.byref(transactionResult)))
 
     """
     Reads the value to be paid.
     """
+
     def readValue(self):
         value = None
 
@@ -67,6 +72,8 @@ class Payment:
 """
 Class to implement payment cancellation routines.
 """
+
+
 class CancelPayment:
 
     """
@@ -74,6 +81,7 @@ class CancelPayment:
 
     plugPag: PlugPag library instance reference.
     """
+
     def __init__(self, plugPag):
         self._lib = plugPag
 
@@ -83,6 +91,7 @@ class CancelPayment:
     transactionResult: TransactionResult to be filled with the transaction's result.
     return: Transaction status code.
     """
+
     def execute(self, transactionResult):
         print('Aguardando estorno...')
         return ctypes.c_int(self._lib.CancelTransaction(ctypes.byref(transactionResult)))
@@ -94,6 +103,8 @@ class CancelPayment:
 """
 Class to implement last transaction query routines.
 """
+
+
 class QueryLastTransaction:
 
     """
@@ -101,6 +112,7 @@ class QueryLastTransaction:
 
     plugPag: PlugPag library instance reference.
     """
+
     def __init__(self, plugPag):
         self._lib = plugPag
 
@@ -110,6 +122,7 @@ class QueryLastTransaction:
     transactionResult: TransactionResult to be filled with the transaction's result.
     return: Transaction status code.
     """
+
     def execute(self, transactionResult):
         print('Consultando ultima transacao...')
         return ctypes.c_int(self._lib.GetLastApprovedTransactionStatus(ctypes.byref(transactionResult)))

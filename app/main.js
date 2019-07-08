@@ -1,12 +1,11 @@
-var editorExtensionId = "knldjmfmopnpolahpmmgbagdohdnhkik";
 var port = null;
 
-function sendMessage() {
+function sendMessage(method) {
   var message = {};
 
   message.action = 'pay';
-  message.amount = document.getElementById('input-text').value;
-  message.paymentMethod = 'credit';
+  message.amount = document.querySelector('#modal-order_payment .topaytop .amount').innerText.toString();
+  message.paymentMethod = method;
 
   port.postMessage(message);
 }
@@ -43,18 +42,29 @@ function onDisconnect() {
 }
 
 function connect() {
-  port = chrome.runtime.connect(editorExtensionId);
-  port.onDisconnect.addListener(onDisconnect);
-  port.onMessage.addListener(onMessage);
+  if (port == null) {
+    port = chrome.runtime.connect();
+    port.onDisconnect.addListener(onDisconnect);
+    port.onMessage.addListener(onMessage);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
 
-  document.getElementById('connect-button').addEventListener(
+  document.querySelector('#wc-pos-register-buttons .wc_pos_register_pay').addEventListener(
     'click', connect);
 
-  document.getElementById('send-message-button').addEventListener(
-    'click', sendMessage);
+  document.getElementById('#modal-order_payment .payment_method_pos_chip_pin2 .pos_chip_pin_order_id div.pos_chip_pin_order_generate a').addEventListener(
+    'click',
+    function(e) {
+      sendMessage('credit');
+    });
+
+  document.getElementById('#modal-order_payment .payment_method_pos_chip_pin2 .pos_chip_pin_order_id div.pos_chip_pin_order_generate a').addEventListener(
+    'click',
+    function(e) {
+      sendMessage('debit');
+    });
 });
 
 console.log('Content script loaded');

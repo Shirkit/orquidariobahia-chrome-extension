@@ -6,7 +6,10 @@
   "content_scripts": [
     {
       "matches": [
-        "https://orquidariobahia.com.br/main.html"
+        "https://orquidariobahia.com.br/main.html",
+        "*://*.orquidariobahia.com.br/point-of-sale/*",
+        "*://orquidariobahia.com.br/point-of-sale/*",
+        "*://shirkit.local/wordpress/point-of-sale/*"
       ],
       "js": ["main.js"],
       "run_at":"document_start"

@@ -7,7 +7,8 @@
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://blejmlgjkiefemelbggaackbadlajdhg/",
-    "chrome-extension://cpfjlhelpbolpadpoohaoopnljgbjage/"
+    "chrome-extension://cpfjlhelpbolpadpoohaoopnljgbjage/",
+    "chrome-extension://indomjmknkgahkekglfbhocojkoamljm/"
   ],
   "icons": {
     "128": "icon.png"

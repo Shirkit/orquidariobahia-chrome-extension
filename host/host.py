@@ -3,11 +3,11 @@ import plugpag
 import re
 import update
 
-update.update();
+update.update()
 
 result = ''
 
-f= open("temp.txt","w+")
+f = open("temp.txt", "w+")
 f.write('conexão')
 
 while True:

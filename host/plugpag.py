@@ -1,4 +1,4 @@
-#-*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 
 import ctypes
 import transaction
@@ -29,6 +29,8 @@ PPPAGSEGURO_PARC_VENDEDOR = 2
 """
 Transaction result structure.
 """
+
+
 class TransactionResult(ctypes.Structure):
     _fields_ = [('rawBuffer', ctypes.ARRAY(65543, ctypes.c_char)),
                 ('message', ctypes.ARRAY(1024, ctypes.c_char)),
@@ -44,22 +46,23 @@ class TransactionResult(ctypes.Structure):
 
     def toDictionary(self):
         return {
-            'transactionCode' : self.transactionCode.decode(ENCODING),
-            'date' : self.date.decode(ENCODING),
-            'time' : self.time.decode(ENCODING),
-            'hostNsu' : self.hostNsu.decode(ENCODING),
-            'cardBrand' : self.cardBrand.decode(ENCODING),
-            'bin' : self.bin.decode(ENCODING),
-            'holder' : self.holder.decode(ENCODING),
-            'userReference' : self.userReference.decode(ENCODING),
-            'terminalSerialNumber' : self.terminalSerialNumber.decode(ENCODING),
+            'transactionCode': self.transactionCode.decode(ENCODING),
+            'date': self.date.decode(ENCODING),
+            'time': self.time.decode(ENCODING),
+            'hostNsu': self.hostNsu.decode(ENCODING),
+            'cardBrand': self.cardBrand.decode(ENCODING),
+            'bin': self.bin.decode(ENCODING),
+            'holder': self.holder.decode(ENCODING),
+            'userReference': self.userReference.decode(ENCODING),
+            'terminalSerialNumber': self.terminalSerialNumber.decode(ENCODING),
         }
-
 
 
 """
 Loads the DLLs and returns the DLLs references to call PlugPag methods.
 """
+
+
 def loadLibraries():
     ppLib = ctypes.cdll.LoadLibrary('lib/PPPagSeguro.dll')
     ctypes.cdll.LoadLibrary('lib/BTSerial.dll')
@@ -68,24 +71,26 @@ def loadLibraries():
     return ppLib
 
 
-
 """
 Initializes PlugPag parameters to allow transactions.
 """
+
+
 def initPlugPag(pagSeguroLib):
-    #print('Definindo nome e versao da aplicacao... ', end = '')
+    # print('Definindo nome e versao da aplicacao... ', end = '')
     pagSeguroLib.SetVersionName(APP_NAME, APP_VERSION)
-    #print('OK')
+    # print('OK')
 
-    #print('Configurando conexao bluetooth... ', end = '')
+    # print('Configurando conexao bluetooth... ', end = '')
     pagSeguroLib.InitBTConnection(BLUETOOTH_PORT)
-    #print('OK')
-
+    # print('OK')
 
 
 """
 Prints a transaction's result.
 """
+
+
 def printResult(resultCode, transactionResult):
     print('+-------------------------------------------------------------')
 
@@ -109,6 +114,7 @@ def printResult(resultCode, transactionResult):
         print('| Terminal serial number: {}'.format(transactionResult.terminalSerialNumber.decode(ENCODING)))
         print('+-------------------------------------------------------------')
 
+
 """
 Main method.
 
@@ -126,6 +132,8 @@ payment - if 'action' is 'pay', then it expects more information about the payme
 
 'amount' the amount.
 """
+
+
 def main(options):
     # Initialize PlugPag
     pp = loadLibraries()
@@ -143,14 +151,14 @@ def main(options):
 
             payment["paymentMethod"] = PPPAGSEGURO_CREDIT
 
-            if not "installment" in options:
+            if "installment" not in options:
                 payment["installmentType"] = PPPAGSEGURO_A_VISTA
                 payment["installment"] = 1
 
             else:
                 parcels = int(options["installment"])
 
-                if parcels > 1 :
+                if parcels > 1:
                     payment["installmentType"] = PPPAGSEGURO_PARC_VENDEDOR
                     payment["installment"] = parcels
 
@@ -165,13 +173,13 @@ def main(options):
 
         payment["amount"] = options["amount"]
 
-        f= open("temp2.txt","w+")
+        f = open("temp2.txt", "w+")
         # Payment option
         try:
             result = transaction.Payment(pp, payment, ENCODING).execute(transactionResult)
             if isinstance(result, ctypes.c_long):
                 result = str(result.value)
-            returning = {"result" : result}
+            returning = {"result": result}
             if result == "0":
                 returning["data"] = transactionResult.toDictionary()
             f.write(str(returning))
@@ -183,7 +191,5 @@ def main(options):
 
     return None
 
-
-
 if __name__ == '__main__':
-    main({'action' : 'pay', 'paymentMethod' : 'credit', 'amount' : '1500'})
+    main({'action': 'pay', 'paymentMethod': 'credit', 'amount': '1500'})

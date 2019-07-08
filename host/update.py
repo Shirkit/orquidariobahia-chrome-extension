@@ -5,6 +5,7 @@ import os
 import json
 from distutils.version import StrictVersion
 
+
 def forceMergeFlatDir(srcDir, dstDir):
     if not os.path.exists(dstDir):
         os.makedirs(dstDir)
@@ -13,9 +14,11 @@ def forceMergeFlatDir(srcDir, dstDir):
         dstFile = os.path.join(dstDir, item)
         forceCopyFile(srcFile, dstFile)
 
-def forceCopyFile (sfile, dfile):
+
+def forceCopyFile(sfile, dfile):
     if os.path.isfile(sfile):
         shutil.copy2(sfile, dfile)
+
 
 def isAFlatDir(sDir):
     for item in os.listdir(sDir):
@@ -32,13 +35,14 @@ def copyTree(src, dst):
         if os.path.isfile(s):
             if not os.path.exists(dst):
                 os.makedirs(dst)
-            forceCopyFile(s,d)
+            forceCopyFile(s, d)
         if os.path.isdir(s):
             isRecursive = not isAFlatDir(s)
             if isRecursive:
                 copyTree(s, d)
             else:
                 forceMergeFlatDir(s, d)
+
 
 def update():
     try:
@@ -52,7 +56,7 @@ def update():
 
             if StrictVersion(local['version']) < StrictVersion(remote['version']):
                 urllib.request.urlretrieve('https://github.com/Shirkit/orquidariobahia-chrome-extension/archive/master.zip', 'master.zip')
-                with zipfile.ZipFile("master.zip","r") as zip_ref:
+                with zipfile.ZipFile("master.zip", "r") as zip_ref:
                     zip_ref.extractall("master")
 
                     source = './master/orquidariobahia-chrome-extension-master/host'
