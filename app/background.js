@@ -11,7 +11,7 @@ function onNativeMessage(message) {
     switch (message.result) {
       case "0":
         response.response = 'pay_ok';
-        response.message = 'Transação autorizada';
+        response.message = orquidario_messages['pay_ok'];
         response.data = message.data
         break;
       case "-1001":
@@ -40,7 +40,7 @@ function onNativeMessage(message) {
       case "-2038":
       case "-3000":
         response.response = 'pay_fatal';
-        response.message = message + ' | Erro fatal. Favor salvar o log e contactar suporte.';
+        response.message = orquidario_messages['pay_fatal'];
         break;
       case "-1003":
       case "-1005":
@@ -52,26 +52,26 @@ function onNativeMessage(message) {
       case "-2028":
       case "-2033":
         response.response = 'pay_tryagain';
-        response.message = message + ' | Falha na transação. Favor tentar novamente.';
+        response.message = orquidario_messages['pay_tryagain'];
         break;
       case "-1004":
         response.response = 'pay_error';
-        response.message = message + ' | Erro na transação. Favor ver o terminal.';
+        response.message = orquidario_messages['pay_error_1004'];
         break;
       case "-1020":
         response.response = 'pay_error';
-        response.message = message + ' | O terminal não pode estar no modo compartilhado.';
+        response.message = orquidario_messages['pay_error_1020'];
         break;
       case "-2001":
       case "-2002":
       case "-2003":
       case "-2005":
         response.response = 'pay_error';
-        response.message = message + ' | Erro de conexão bluetooth. Não é possível realizar a conexão.';
+        response.message = orquidario_messages['pay_error_bluetooth'];
         break;
       default:
         response.response = 'unkown_error';
-        response.message = message;
+        response.message = orquidario_messages['unkown_error'];
         break;
     }
     connection.postMessage(response);
@@ -84,17 +84,18 @@ function onMessage(message) {
     if (!message.amount || !message.paymentMethod) {
       connection.postMessage({
         response: 'pay_fatal',
-        message: 'Valor ou método de pagamento não informado.'
+        message: orquidario_messages['pay_fatal']
       })
     } else {
-      connection.postMessage(JSON.parse('{"response":"pay_ok","message":"Transação autorizada","data":{"transactionCode":"1A8D27707D7D4428957FD4DC6B62020F","date":"2019-07-06","time":"15:34:38","hostNsu":"70600011698","cardBrand":"MASTERCARD","bin":"516292","holder":"8357","userReference":"UserRef","terminalSerialNumber":"1260091723"}}'));
+      setTimeout(function() {connection.postMessage(JSON.parse('{"response":"pay_ok","message":"Transação autorizada","data":{"transactionCode":"1A8D27707D7D4428957FD4DC6B62020F","date":"2019-07-06","time":"15:34:38","hostNsu":"70600011698","cardBrand":"MASTERCARD","bin":"516292","holder":"8357","userReference":"UserRef","terminalSerialNumber":"1260091723"}}'));}, 7000);
       //native.postMessage(message);
     }
   } else {
     connection.postMessage({
       response: 'unkown_error',
-      message: 'Ação inválida. Por favor, falar com o suporte.'
+      message: orquidario_messages['unkown_error']
     });
+    console.error(message);
   }
 }
 
@@ -110,14 +111,14 @@ function onNativeDisconnect() {
   if (connection !== null) {
     connection.postMessage({
       response: 'connect_error',
-      message: 'O terminal desconectou. Favor tentar novamente.'
+      message: orquidario_messages['connect_error']
     });
     connection.disconnect();
     connection = null;
   }
 }
 
-chrome.runtime.onConnect.addListener(
+chrome.runtime.onConnectExternal.addListener(
   function(port) {
     if (connection === null) {
       connection = port;
@@ -128,14 +129,18 @@ chrome.runtime.onConnect.addListener(
       native.onMessage.addListener(onNativeMessage);
       native.onDisconnect.addListener(onNativeDisconnect);
 
-      port.postMessage({
-        response: 'connect_ok'
-      });
+      setTimeout(function() {
+        if (connection != null && native != null)
+          port.postMessage({
+            response: 'connect_ok',
+            message: orquidario_messages['connect_ok']
+          });
+      }, 1000);
       return true;
     } else {
-      console.log("Someone is already connected");
       port.postMessage({
-        response: 'connect_busy'
+        response: 'connect_busy',
+        message: orquidario_messages['connect_busy']
       });
       port.disconnect();
       return false;

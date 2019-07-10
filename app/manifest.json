@@ -7,22 +7,31 @@
     {
       "matches": [
         "https://orquidariobahia.com.br/main.html",
-        "*://*.orquidariobahia.com.br/point-of-sale/*",
-        "*://orquidariobahia.com.br/point-of-sale/*",
-        "*://shirkit.local/wordpress/point-of-sale/*"
+        "*://*.orquidariobahia.com.br/*",
+        "*://orquidariobahia.com.br/*",
+        "*://shirkit.local/wordpress/*"
       ],
-      "js": ["main.js"],
-      "run_at":"document_start"
+      "js": ["content.js"],
+      "run_at":"document_end"
     }
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://orquidariobahia.com.br/main.html",
+      "*://*.orquidariobahia.com.br/*",
+      "*://orquidariobahia.com.br/*",
+      "*://shirkit.local/wordpress/*"
+    ]
+  },
+  "web_accessible_resources": ["main.js"],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["background.js", "messages.js"],
     "persistent": false
   },
   "icons": {
     "128": "icon.png"
   },
   "permissions": [
-    "nativeMessaging", "activeTab", "background"
+    "nativeMessaging", "background"
   ]
 }
