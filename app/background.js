@@ -1,8 +1,11 @@
 const hostName = "br.com.orquidariobahia.companion";
 var native = null;
 var connection = null;
+var bugout = new debugout();
+bugout.useLocalStorage = true;
 
 function onNativeMessage(message) {
+  bugout.log('Message received from Native:' + message);
   var response = {}
   if (message === null) {
     console.log('Null message received from native.');
@@ -79,7 +82,8 @@ function onNativeMessage(message) {
 }
 
 
-function onMessage(message) {
+function onMessageExternal(message) {
+  bugout.log('Message received from External:' + message);
   if (message.action === 'pay') {
     if (!message.amount || !message.paymentMethod) {
       connection.postMessage({
@@ -99,7 +103,7 @@ function onMessage(message) {
   }
 }
 
-function onDisconnect() {
+function onDisconnectExternal() {
   connection = null;
   if (native !== null) {
     native.disconnect();
@@ -122,8 +126,8 @@ chrome.runtime.onConnectExternal.addListener(
   function(port) {
     if (connection === null) {
       connection = port;
-      connection.onMessage.addListener(onMessage);
-      connection.onDisconnect.addListener(onDisconnect);
+      connection.onMessage.addListener(onMessageExternal);
+      connection.onDisconnect.addListener(onDisconnectExternal);
 
       native = chrome.runtime.connectNative(hostName);
       native.onMessage.addListener(onNativeMessage);
@@ -147,4 +151,4 @@ chrome.runtime.onConnectExternal.addListener(
     }
   });
 
-console.log('Background extension loaded');
+bugout.log('Background extension loaded');
