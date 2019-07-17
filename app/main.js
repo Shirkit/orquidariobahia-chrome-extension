@@ -1,4 +1,4 @@
-const EXTENSION_ID = 'indomjmknkgahkekglfbhocojkoamljm';
+const EXTENSION_ID = 'oohlefcejeepmkpmfdcielfihhcclphh';
 
 var port = null;
 var blocker = null;

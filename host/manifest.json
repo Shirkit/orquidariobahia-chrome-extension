@@ -8,7 +8,8 @@
   "allowed_origins": [
     "chrome-extension://blejmlgjkiefemelbggaackbadlajdhg/",
     "chrome-extension://cpfjlhelpbolpadpoohaoopnljgbjage/",
-    "chrome-extension://indomjmknkgahkekglfbhocojkoamljm/"
+    "chrome-extension://indomjmknkgahkekglfbhocojkoamljm/",
+    "chrome-extension://oohlefcejeepmkpmfdcielfihhcclphh/"
   ],
   "icons": {
     "128": "icon.png"
