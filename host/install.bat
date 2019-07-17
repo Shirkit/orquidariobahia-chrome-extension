@@ -6,3 +6,5 @@
 :: %~dp0 is the directory containing this bat script and ends with a backslash.
 REG ADD "HKCU\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /ve /t REG_SZ /d "%~dp0manifest.json" /f
 REG ADD "HKLM\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /ve /t REG_SZ /d "%~dp0manifest.json" /f
+REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "QZ Tray" /d "java -Xms1024m -Xmx1024m -jar \"%PROGRAMFILES%\QZ Tray\qz-tray.jar\"" /f
+REG ADD "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "QZ Tray" /d "java -Xms1024m -Xmx1024m -jar \"%PROGRAMFILES%\QZ Tray\qz-tray.jar\"" /f

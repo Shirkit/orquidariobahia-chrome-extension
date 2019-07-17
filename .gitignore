@@ -3,3 +3,4 @@ host/__pycache__/
 **/*.txt
 **/*.log
 **/node_modules/**
+/build

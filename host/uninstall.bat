@@ -4,3 +4,6 @@
 :: Deletes the entry created by install_host.bat
 REG DELETE "HKCU\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /f
 REG DELETE "HKLM\Software\Google\Chrome\NativeMessagingHosts\br.com.orquidariobahia.companion" /f
+
+REG DELETE "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "QZ Tray" /f
+REG DELETE "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "QZ Tray" /f
