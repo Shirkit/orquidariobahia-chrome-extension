@@ -1,5 +1,7 @@
 # orquidariobahia-chrome-plugin
 
+Google Chrome Extensions URL: https://chrome.google.com/webstore/detail/blejmlgjkiefemelbggaackbadlajdhg/publish-delayed
+
 Requirements:
 
 - INNO Setup: http://www.jrsoftware.org/isdl.php
