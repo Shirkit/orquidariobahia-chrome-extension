@@ -1,6 +1,6 @@
 # orquidariobahia-chrome-plugin
 
-Google Chrome Extensions URL: https://chrome.google.com/webstore/detail/blejmlgjkiefemelbggaackbadlajdhg/publish-delayed
+Google Chrome Extensions URL: https://chrome.google.com/webstore/detail/blejmlgjkiefemelbggaackbadlajdhg/ 
 
 Requirements:
 
