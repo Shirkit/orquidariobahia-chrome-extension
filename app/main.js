@@ -62,7 +62,10 @@ function onMessage(message) {
         is_processing = false;
         blocker.unblock();
         displayMessageToUser(message.message, 'success');
-        window.postMessage({message : 'pay_ok', data : message.data});
+        window.postMessage({
+          message: 'pay_ok',
+          data: message.data
+        });
         break;
 
       case 'pay_tryagain':
@@ -200,21 +203,25 @@ function init() {
 
       clearInterval(jQueryTimer);
 
-      jQuery( document ).ajaxSuccess(function( evt, xhr, settings ) {
+      jQuery(document).ajaxSuccess(function(evt, xhr, settings) {
         // TODO: logging
         if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed' && window.lastOrderId == xhr.responseJSON.id) {
-          print_queue.push({id : window.lastOrderId});
+          print_queue.push({
+            id: window.lastOrderId
+          });
           request_nf(print_queue[0]);
         }
       });
 
-      jQuery( document ).ajaxError(function( event, xhr, settings ) {
+      jQuery(document).ajaxError(function(event, xhr, settings) {
         // TODO: logging
         if (settings.url.includes('wp-json/wc/v3/pos_orders/')) {
           try {
             var obj = JSON.parse(xhr.responseText.substr(xhr.responseText.indexOf('['), xhr.responseText.lastIndexOf(']')));
             if (obj.status == 'completed' && window.lastOrderId == obj.id) {
-              print_queue.push({id : window.lastOrderId});
+              print_queue.push({
+                id: window.lastOrderId
+              });
               request_nf(print_queue[0]);
             }
           } catch (e) {}
@@ -232,14 +239,17 @@ function init() {
 
 function qz_connect() {
   return new RSVP.Promise(function(resolve, reject) {
-    if (qz.websocket.isActive()) {	// if already active, resolve immediately
+    if (qz.websocket.isActive()) { // if already active, resolve immediately
       resolve();
     } else {
       // try to connect once before firing the mimetype launcher
       qz.websocket.connect().then(resolve, function retry() {
         // if a connect was not succesful, launch the mimetime, try 3 more times
         window.location.assign("qz:launch");
-        qz.websocket.connect({ retries: 2, delay: 1 }).then(resolve, reject);
+        qz.websocket.connect({
+          retries: 2,
+          delay: 1
+        }).then(resolve, reject);
       });
     }
   });
@@ -254,28 +264,27 @@ function qz_save() {
 function request_nf(job) {
   jQuery.ajax({
     url: '../../../wp-json/wc/v3/nota-fiscal',
-    data : {
-      id : job.id
+    data: {
+      id: job.id
     },
     timeout: 0
-  },
-).done(function(event, xhr, settings) {
-  // TODO: logging
-  job.url = event[0].url_danfe;
-  nf_html_get(job);
-}).fail(function(evt) {
-     // TODO: logging
-     try {
-       var obj = JSON.parse(evt.responseText.substr(evt.responseText.indexOf('['), evt.responseText.lastIndexOf(']')));
-       if (obj[0].status == 'aprovado' && obj[0].uuid) {
-         job.url = obj[0].url_danfe;
-         nf_html_get(job.url);
-       }
-     } catch (e) {
-       console.log('catch');
-       console.log(e);
-     }
-   });
+  }, ).done(function(event, xhr, settings) {
+    // TODO: logging
+    job.url = event[0].url_danfe;
+    nf_html_get(job);
+  }).fail(function(evt) {
+    // TODO: logging
+    try {
+      var obj = JSON.parse(evt.responseText.substr(evt.responseText.indexOf('['), evt.responseText.lastIndexOf(']')));
+      if (obj[0].status == 'aprovado' && obj[0].uuid) {
+        job.url = obj[0].url_danfe;
+        nf_html_get(job.url);
+      }
+    } catch (e) {
+      console.log('catch');
+      console.log(e);
+    }
+  });
 }
 
 function nf_html_get(job) {
@@ -284,15 +293,14 @@ function nf_html_get(job) {
   jQuery.ajax({
     url: job.url,
     timeout: 0
-  },
-).done(function(evt, xhr, settings) {
-  // TODO: logging
-  job.html = evt;
-  qz_print(job);
-}).fail(function(evt) {
-  // TODO: logging
-   });
-   jQuery.ajaxSettings.headers["X-WP-Nonce"] = header;
+  }, ).done(function(evt, xhr, settings) {
+    // TODO: logging
+    job.html = evt;
+    qz_print(job);
+  }).fail(function(evt) {
+    // TODO: logging
+  });
+  jQuery.ajaxSettings.headers["X-WP-Nonce"] = header;
 }
 
 function qz_config() {
@@ -301,13 +309,12 @@ function qz_config() {
     jQuery('#modal-printer_select select#selected_printer').empty();
     qz_connect().then(function() {
       qz.printers.find().then(function(data) {
-        for(var i = 0; i < data.length; i++) {
-          jQuery('#modal-printer_select select#selected_printer').append(jQuery('<option>',
-          {
+        for (var i = 0; i < data.length; i++) {
+          jQuery('#modal-printer_select select#selected_printer').append(jQuery('<option>', {
             value: data[i],
-            text : data[i]
+            text: data[i]
           })).val(JSON.parse(localStorage.getItem('qz_selected_printer')));
-         }
+        }
       });
     });
 
@@ -317,22 +324,31 @@ function qz_config() {
 
 // print logic
 function qz_print(job) {
-    var printer = JSON.parse(localStorage.getItem('qz_selected_printer'));
-    var options =  { size: { width: 80 }, units: "mm"};
-    var config = qz.configs.create(printer, options);
-    var data = [{ type: 'html', format: 'plain', data: html }];
+  var printer = JSON.parse(localStorage.getItem('qz_selected_printer'));
+  var options = {
+    size: {
+      width: 80
+    },
+    units: "mm"
+  };
+  var config = qz.configs.create(printer, options);
+  var data = [{
+    type: 'html',
+    format: 'plain',
+    data: html
+  }];
 
-    currently_printing.push(job);
-    print_queue.splice(print_queue.indexOf(job), 1);
+  currently_printing.push(job);
+  print_queue.splice(print_queue.indexOf(job), 1);
 
-    // return the promise so we can chain more .then().then().catch(), etc.
-    return qz.print(config, data).catch(function(e) {
-      print_queue.unshift(job);
-      currently_printing.splice(currently_printing.indexOf(job), 1);
-      displayMessageToUser('Erro ao imprimir NFC-e: ' + e, 'error');
-    }).then(function(e) {
-      currently_printing.splice(currently_printing.indexOf(job), 1);
-    });
+  // return the promise so we can chain more .then().then().catch(), etc.
+  return qz.print(config, data).catch(function(e) {
+    print_queue.unshift(job);
+    currently_printing.splice(currently_printing.indexOf(job), 1);
+    displayMessageToUser('Erro ao imprimir NFC-e: ' + e, 'error');
+  }).then(function(e) {
+    currently_printing.splice(currently_printing.indexOf(job), 1);
+  });
 }
 
 if (document.readyState === "complete" || document.readyState === "loaded" || document.readyState === "interactive") {

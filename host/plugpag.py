@@ -191,5 +191,6 @@ def main(options):
 
     return None
 
+
 if __name__ == '__main__':
     main({'action': 'pay', 'paymentMethod': 'credit', 'amount': '1500'})
