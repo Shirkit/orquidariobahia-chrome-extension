@@ -5,6 +5,7 @@ var blocker = null;
 var is_processing = false;
 var print_queue = [];
 var currently_printing = [];
+var notas = [];
 
 function sendPayMessage(method) {
   var message = {};
@@ -146,6 +147,11 @@ function init() {
     el.parentElement.insertBefore(wrapper.firstChild, null);
   }
 
+  var wrapper = document.querySelector('#modal-order_payment #payment_switch_wrap');
+  var nfce = document.createElement('input');
+  wrapper.insertBefore(nfce, null);
+  nfce.outerHTML = `<input type="checkbox" class="payment_switch" value="yes" name="payment_print_nfce" id="payment_print_nfce" data-animate="true" data-label-text="<span class='payment_gift_receipt_switch_label'>NFC-e</span>" data-on-text="Yes" data-off-text="No" checked="true"'>`;
+
   document.querySelector('.payment_method_pos_chip_pin .try_again-chip-pin').addEventListener('click', function(e) {
     if (document.querySelector("#pos_chip_pin #generate_order_id").style.display == 'none') {
       is_processing = true;
@@ -206,10 +212,14 @@ function init() {
       jQuery(document).ajaxSuccess(function(evt, xhr, settings) {
         // TODO: logging
         if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed' && window.lastOrderId == xhr.responseJSON.id) {
-          print_queue.push({
-            id: window.lastOrderId
-          });
-          request_nf(print_queue[0]);
+          var o = {
+            id: window.lastOrderId,
+            total: window.lastOrderTotal,
+            time: new Date()
+          };
+          print_queue.push(o);
+          notas.unshift(o);
+          request_nf(o);
         }
       });
 
@@ -219,10 +229,14 @@ function init() {
           try {
             var obj = JSON.parse(xhr.responseText.substr(xhr.responseText.indexOf('['), xhr.responseText.lastIndexOf(']')));
             if (obj.status == 'completed' && window.lastOrderId == obj.id) {
-              print_queue.push({
-                id: window.lastOrderId
-              });
-              request_nf(print_queue[0]);
+              var o = {
+                id: window.lastOrderId,
+                total: window.lastOrderTotal,
+                time: new Date()
+              };
+              print_queue.push(o);
+              notas.unshift(o);
+              request_nf(o);
             }
           } catch (e) {}
         }
@@ -233,6 +247,8 @@ function init() {
       jQuery('#wc-pos-actions #printer_select').click(qz_config);
 
       jQuery('#modal-printer_select #save_selected_printer').click(qz_save);
+
+      jQuery('#payment_switch_wrap .payment_switch').bootstrapSwitch();
     }
   }, 100);
 }
@@ -261,7 +277,10 @@ function qz_save() {
   closeModal('modal-printer_select');
 }
 
-function request_nf(job) {
+function request_nf(job, should_print = false) {
+  if (!should_print)
+    should_print = jQuery('#payment_print_nfce').bootstrapSwitch('state');
+  // TODO: handle if server refused to generate
   jQuery.ajax({
     url: '../../../wp-json/wc/v3/nota-fiscal',
     data: {
@@ -271,18 +290,19 @@ function request_nf(job) {
   }, ).done(function(event, xhr, settings) {
     // TODO: logging
     job.url = event[0].url_danfe;
-    nf_html_get(job);
+    if (should_print)
+      nf_html_get(job);
   }).fail(function(evt) {
     // TODO: logging
     try {
       var obj = JSON.parse(evt.responseText.substr(evt.responseText.indexOf('['), evt.responseText.lastIndexOf(']')));
       if (obj[0].status == 'aprovado' && obj[0].uuid) {
         job.url = obj[0].url_danfe;
-        nf_html_get(job.url);
+        if (should_print)
+          nf_html_get(job);
       }
     } catch (e) {
-      console.log('catch');
-      console.log(e);
+      // TODO: Logging
     }
   });
 }
@@ -318,8 +338,37 @@ function qz_config() {
       });
     });
 
+    var table = document.querySelector('#modal-printer_select table#past_orders').getElementsByTagName('tbody')[0];
+    while (table.rows.length > 0) {
+      table.deleteRow(0);
+    }
+    for (var i = 0; i < notas.length && i < 10; i++) {
+      var row = table.insertRow(0);
+      row.insertCell(0).innerHTML = notas[i].id;
+      row.insertCell(1).innerHTML = notas[i].total;
+      row.insertCell(2).innerHTML = notas[i].time.toLocaleTimeString();
+      var btn = document.createElement('div');
+      btn.className = 'wrap-button';
+      btn.innerHTML = '<button class="button button-primary wp-button-large alignright manual-print-order" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Imprimir</button>';
+      row.insertCell(3).innerHTML = btn.outerHTML;
+    }
+
   } else
     displayMessageToUser('Módulo de Impressão não encontrado', 'warning');
+}
+
+function manual_print_nf(id) {
+  for (var i = 0; i < notas.length; i++) {
+    if (notas[i] && notas[i].id == id) {
+      if (notas[i].html)
+        qz_print(notas[i]);
+      else if (notas[i].url)
+        nf_html_get(notas[i]);
+      else
+        request_nf(notas[i], true);
+      break;
+    }
+  }
 }
 
 // print logic
@@ -335,19 +384,21 @@ function qz_print(job) {
   var data = [{
     type: 'html',
     format: 'plain',
-    data: html
+    data: job.html
   }];
 
   currently_printing.push(job);
   print_queue.splice(print_queue.indexOf(job), 1);
 
   // return the promise so we can chain more .then().then().catch(), etc.
-  return qz.print(config, data).catch(function(e) {
-    print_queue.unshift(job);
-    currently_printing.splice(currently_printing.indexOf(job), 1);
-    displayMessageToUser('Erro ao imprimir NFC-e: ' + e, 'error');
-  }).then(function(e) {
-    currently_printing.splice(currently_printing.indexOf(job), 1);
+  return qz_connect().then(function() {
+    qz.print(config, data).catch(function(e) {
+      print_queue.unshift(job);
+      currently_printing.splice(currently_printing.indexOf(job), 1);
+      displayMessageToUser('Erro ao imprimir NFC-e: ' + e, 'error');
+    }).then(function(e) {
+      currently_printing.splice(currently_printing.indexOf(job), 1);
+    });
   });
 }
 
