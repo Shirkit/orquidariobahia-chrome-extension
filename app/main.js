@@ -212,10 +212,12 @@ function init() {
       jQuery(document).ajaxSuccess(function(evt, xhr, settings) {
         // TODO: logging
         if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed' && window.lastOrderId == xhr.responseJSON.id) {
+          debugger;
           var o = {
             id: window.lastOrderId,
             total: window.lastOrderTotal,
-            time: new Date()
+            time: new Date(),
+            receipt: xhr.responseJSON.print_url
           };
           print_queue.push(o);
           notas.unshift(o);
@@ -229,10 +231,12 @@ function init() {
           try {
             var obj = JSON.parse(xhr.responseText.substr(xhr.responseText.indexOf('['), xhr.responseText.lastIndexOf(']')));
             if (obj.status == 'completed' && window.lastOrderId == obj.id) {
+              debugger;
               var o = {
                 id: window.lastOrderId,
                 total: window.lastOrderTotal,
-                time: new Date()
+                time: new Date(),
+                receipt: obj.print_url
               };
               print_queue.push(o);
               notas.unshift(o);
@@ -349,7 +353,9 @@ function qz_config() {
       row.insertCell(2).innerHTML = notas[i].time.toLocaleTimeString();
       var btn = document.createElement('div');
       btn.className = 'wrap-button';
-      btn.innerHTML = '<button class="button button-primary wp-button-large alignright manual-print-order" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Imprimir</button>';
+      txt = '<button class="button button-primary wp-button-large alignright manual-print-order-nf" onclick="manual_print_nf(' + notas[i].id + ')" type="button">NFC-e</button>';
+      txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_receipt(' + notas[i].id + ')" type="button">Recibo</button>';
+      btn.innerHTML = txt;
       row.insertCell(3).innerHTML = btn.outerHTML;
     }
 
@@ -367,6 +373,14 @@ function manual_print_nf(id) {
       else
         request_nf(notas[i], true);
       break;
+    }
+  }
+}
+
+function manual_print_receipt(id) {
+  for (var i = 0; i < notas.length; i++) {
+    if (notas[i] && notas[i].id == id) {
+      posPrintReceipt(notas[i].receipt, false);
     }
   }
 }
