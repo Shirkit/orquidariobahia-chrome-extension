@@ -23,7 +23,7 @@
       "*://shirkit.local/wordpress/point-of-sale/*"
     ]
   },
-  "web_accessible_resources": ["main.js", "node_modules/qz-tray/qz-tray.js", "deps/rsvp-3.1.0.min.js", "deps/sha-256.min.js"],
+  "web_accessible_resources": ["main.js", "node_modules/qz-tray/qz-tray-v2.1.js", "deps/rsvp-3.1.0.min.js", "deps/sha-256.min.js"],
   "background": {
     "scripts": ["node_modules/debugout.js/debugout.js", "background.js", "messages.js"],
     "persistent": false

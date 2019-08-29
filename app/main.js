@@ -212,7 +212,6 @@ function init() {
       jQuery(document).ajaxSuccess(function(evt, xhr, settings) {
         // TODO: logging
         if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed' && window.lastOrderId == xhr.responseJSON.id) {
-          debugger;
           var o = {
             id: window.lastOrderId,
             total: window.lastOrderTotal,
@@ -389,10 +388,6 @@ function manual_print_receipt(id) {
 function qz_print(job) {
   var printer = JSON.parse(localStorage.getItem('qz_selected_printer'));
   var options = {
-    size: {
-      width: 80
-    },
-    units: "mm"
   };
   var config = qz.configs.create(printer, options);
   var data = [{
