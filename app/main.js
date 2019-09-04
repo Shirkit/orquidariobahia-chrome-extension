@@ -150,7 +150,11 @@ function init() {
   var wrapper = document.querySelector('#modal-order_payment #payment_switch_wrap');
   var nfce = document.createElement('input');
   wrapper.insertBefore(nfce, null);
-  nfce.outerHTML = `<input type="checkbox" class="payment_switch" value="yes" name="payment_print_nfce" id="payment_print_nfce" data-animate="true" data-label-text="<span class='payment_gift_receipt_switch_label'>NFC-e</span>" data-on-text="Yes" data-off-text="No" checked="true"'>`;
+  nfce.outerHTML = `<input type="checkbox" class="payment_switch" value="yes" name="payment_emit_nfce" id="payment_emit_nfce" data-animate="true" data-label-text="<span class='payment_switch_label_terms'>Emitir;;</span>" data-on-text="Yes" data-off-text="No" checked="true"'>`;
+
+  var pp = document.createElement('input');
+  wrapper.insertBefore(pp, null);
+  pp.outerHTML = `<input type="checkbox" class="payment_switch" value="yes" name="payment_print_nfce" id="payment_print_nfce" data-animate="true" data-label-text="<span class='payment_switch_label'>NFC-e;;</span>" data-on-text="Yes" data-off-text="No" checked="true"'>`;
 
   document.querySelector('.payment_method_pos_chip_pin .try_again-chip-pin').addEventListener('click', function(e) {
     if (document.querySelector("#pos_chip_pin #generate_order_id").style.display == 'none') {
@@ -220,7 +224,8 @@ function init() {
           };
           print_queue.push(o);
           notas.unshift(o);
-          request_nf(o);
+          if (jQuery('#payment_emit_nfce').bootstrapSwitch('state'))
+            request_nf(o);
         }
       });
 
@@ -239,7 +244,8 @@ function init() {
               };
               print_queue.push(o);
               notas.unshift(o);
-              request_nf(o);
+              if (jQuery('#payment_emit_nfce').bootstrapSwitch('state'))
+                request_nf(o);
             }
           } catch (e) {}
         }
@@ -252,6 +258,11 @@ function init() {
       jQuery('#modal-printer_select #save_selected_printer').click(qz_save);
 
       jQuery('#payment_switch_wrap .payment_switch').bootstrapSwitch();
+
+      jQuery('#modal-order_payment .pos_end_toggles .bootstrap-switch span span').each(function() {
+        jQuery(this).text(jQuery(this).text().replace(';;',''));
+        jQuery(this).text(jQuery(this).text().replace('Print','Recibo'));
+      });
     }
   }, 100);
 }
@@ -352,8 +363,11 @@ function qz_config() {
       row.insertCell(2).innerHTML = notas[i].time.toLocaleTimeString();
       var btn = document.createElement('div');
       btn.className = 'wrap-button';
-      txt = '<button class="button button-primary wp-button-large alignright manual-print-order-nf" onclick="manual_print_nf(' + notas[i].id + ')" type="button">NFC-e</button>';
-      txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_receipt(' + notas[i].id + ')" type="button">Recibo</button>';
+      txt = '<button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_receipt(' + notas[i].id + ')" type="button">Recibo</button>';
+      if (notas[i].url)
+        txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-nf" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Imprimir NFC-e</button>';
+      if (!notas[i].url)
+        txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Emitir NFC-e</button>';
       btn.innerHTML = txt;
       row.insertCell(3).innerHTML = btn.outerHTML;
     }
