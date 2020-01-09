@@ -1,15 +1,12 @@
 {
   "manifest_version": 2,
   "name": "br.com.orquidariobahia.companion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Native compaining app for Orquidario Bahia helper.",
   "path": "start.bat",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://blejmlgjkiefemelbggaackbadlajdhg/",
-    "chrome-extension://cpfjlhelpbolpadpoohaoopnljgbjage/",
-    "chrome-extension://indomjmknkgahkekglfbhocojkoamljm/",
-    "chrome-extension://oohlefcejeepmkpmfdcielfihhcclphh/"
+    "chrome-extension://blejmlgjkiefemelbggaackbadlajdhg/"
   ],
   "icons": {
     "128": "icon.png"

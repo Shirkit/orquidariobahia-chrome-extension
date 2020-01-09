@@ -4,3 +4,4 @@ host/__pycache__/
 **/*.log
 **/node_modules/**
 /build
+/node_modules/

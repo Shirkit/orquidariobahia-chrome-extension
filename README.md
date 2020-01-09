@@ -1,6 +1,6 @@
 # orquidariobahia-chrome-plugin
 
-Google Chrome Extensions URL: https://chrome.google.com/webstore/detail/blejmlgjkiefemelbggaackbadlajdhg/ 
+Google Chrome Extensions URL: https://chrome.google.com/webstore/detail/blejmlgjkiefemelbggaackbadlajdhg/
 
 Requirements:
 
@@ -9,4 +9,6 @@ Requirements:
 - NPM
 - Navigate to `app` and run `npm install`
 
-To build the installation, use the `orquidario.iss` file and change path to match yours
+To build the installation, use the `orquidario.iss` file and change path to match yours.
+
+The `host` has an auto-updater feature, so when the `host/manifest.json` version increases, it will automatically update.

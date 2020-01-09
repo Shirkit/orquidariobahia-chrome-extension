@@ -1,4 +1,4 @@
-const hostName = "br.com.orquidariobahia.companion";
+const HOST_NAME = "br.com.orquidariobahia.companion";
 var native = null;
 var connection = null;
 var bugout = new debugout();
@@ -131,7 +131,7 @@ chrome.runtime.onConnectExternal.addListener(
       connection.onMessage.addListener(onMessageExternal);
       connection.onDisconnect.addListener(onDisconnectExternal);
 
-      native = chrome.runtime.connectNative(hostName);
+      native = chrome.runtime.connectNative(HOST_NAME);
       native.onMessage.addListener(onNativeMessage);
       native.onDisconnect.addListener(onNativeDisconnect);
 

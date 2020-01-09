@@ -1,4 +1,4 @@
-const EXTENSION_ID = 'oohlefcejeepmkpmfdcielfihhcclphh';
+const EXTENSION_ID = 'blejmlgjkiefemelbggaackbadlajdhg';
 
 var port = null;
 var blocker = null;
@@ -215,17 +215,16 @@ function init() {
 
       jQuery(document).ajaxSuccess(function(evt, xhr, settings) {
         // TODO: logging
-        if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed' && window.lastOrderId == xhr.responseJSON.id) {
+        if (settings.url.includes('wp-json/wc/v3/pos_orders/') && xhr.responseJSON.status == 'completed') {
           var o = {
-            id: window.lastOrderId,
-            total: window.lastOrderTotal,
+            id: xhr.responseJSON.id,
+            total: xhr.responseJSON.total,
             time: new Date(),
             receipt: xhr.responseJSON.print_url
           };
           print_queue.push(o);
           notas.unshift(o);
-          if (jQuery('#payment_emit_nfce').bootstrapSwitch('state'))
-            request_nf(o);
+          request_nf(o, jQuery('#payment_print_nfce').bootstrapSwitch('state'), jQuery('#payment_emit_nfce').bootstrapSwitch('state'));
         }
       });
 
@@ -234,18 +233,17 @@ function init() {
         if (settings.url.includes('wp-json/wc/v3/pos_orders/')) {
           try {
             var obj = JSON.parse(xhr.responseText.substr(xhr.responseText.indexOf('['), xhr.responseText.lastIndexOf(']')));
-            if (obj.status == 'completed' && window.lastOrderId == obj.id) {
+            if (obj.status == 'completed') {
               debugger;
               var o = {
-                id: window.lastOrderId,
-                total: window.lastOrderTotal,
+                id: obj.id,
+                total: obj.total,
                 time: new Date(),
                 receipt: obj.print_url
               };
               print_queue.push(o);
               notas.unshift(o);
-              if (jQuery('#payment_emit_nfce').bootstrapSwitch('state'))
-                request_nf(o);
+              request_nf(o, jQuery('#payment_print_nfce').bootstrapSwitch('state'), jQuery('#payment_emit_nfce').bootstrapSwitch('state'));
             }
           } catch (e) {}
         }
@@ -291,21 +289,24 @@ function qz_save() {
   closeModal('modal-printer_select');
 }
 
-function request_nf(job, should_print = false) {
-  if (!should_print)
-    should_print = jQuery('#payment_print_nfce').bootstrapSwitch('state');
+function request_nf(job, should_print = false, emit = true) {
   // TODO: handle if server refused to generate
   jQuery.ajax({
     url: '../../../wp-json/wc/v3/nota-fiscal',
     data: {
-      id: job.id
+      id: job.id,
+      force: emit
     },
     timeout: 0
   }, ).done(function(event, xhr, settings) {
     // TODO: logging
-    job.url = event[0].url_danfe;
-    if (should_print)
+    if (event[0].status == 'aprovado' && event[0].uuid) {
+      job.url = event[0].url_danfe;
+      if (should_print)
       nf_html_get(job);
+    } else {
+      // TODO: o que fazer quando a nota não emitir
+    }
   }).fail(function(evt) {
     // TODO: logging
     try {
@@ -314,6 +315,8 @@ function request_nf(job, should_print = false) {
         job.url = obj[0].url_danfe;
         if (should_print)
           nf_html_get(job);
+      } else {
+        // TODO: o que fazer quando a nota não emitir
       }
     } catch (e) {
       // TODO: Logging
@@ -384,7 +387,7 @@ function manual_print_nf(id) {
       else if (notas[i].url)
         nf_html_get(notas[i]);
       else
-        request_nf(notas[i], true);
+        request_nf(notas[i], true, true);
       break;
     }
   }
