@@ -92,9 +92,9 @@ function onMessageExternal(message) {
       })
     } else {
       setTimeout(function() {
-        connection.postMessage(JSON.parse('{"response":"pay_ok","message":"Transação autorizada","data":{"transactionCode":"1A8D27707D7D4428957FD4DC6B62020F","date":"2019-07-06","time":"15:34:38","hostNsu":"70600011698","cardBrand":"MASTERCARD","bin":"516292","holder":"8357","userReference":"UserRef","terminalSerialNumber":"1260091723"}}'));
+        native.postMessage(message);
+        //connection.postMessage(JSON.parse('{"response":"pay_ok","message":"Transação autorizada","data":{"transactionCode":"1A8D27707D7D4428957FD4DC6B62020F","date":"2019-07-06","time":"15:34:38","hostNsu":"70600011698","cardBrand":"MASTERCARD","bin":"516292","holder":"8357","userReference":"UserRef","terminalSerialNumber":"1260091723"}}'));
       }, 7000);
-      //native.postMessage(message);
     }
   } else {
     connection.postMessage({
