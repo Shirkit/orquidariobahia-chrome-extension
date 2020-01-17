@@ -258,8 +258,8 @@ function init() {
       jQuery('#payment_switch_wrap .payment_switch').bootstrapSwitch();
 
       jQuery('#modal-order_payment .pos_end_toggles .bootstrap-switch span span').each(function() {
-        jQuery(this).text(jQuery(this).text().replace(';;',''));
-        jQuery(this).text(jQuery(this).text().replace('Print','Recibo'));
+        jQuery(this).text(jQuery(this).text().replace(';;', ''));
+        jQuery(this).text(jQuery(this).text().replace('Print', 'Recibo'));
       });
     }
   }, 100);
@@ -303,7 +303,7 @@ function request_nf(job, should_print = false, emit = true) {
     if (event[0].status == 'aprovado' && event[0].uuid) {
       job.url = event[0].url_danfe;
       if (should_print)
-      nf_html_get(job);
+        nf_html_get(job);
     } else {
       // TODO: o que fazer quando a nota não emitir
     }
@@ -404,8 +404,7 @@ function manual_print_receipt(id) {
 // print logic
 function qz_print(job) {
   var printer = JSON.parse(localStorage.getItem('qz_selected_printer'));
-  var options = {
-  };
+  var options = {};
   var config = qz.configs.create(printer, options);
   var data = [{
     type: 'html',

@@ -83,7 +83,7 @@ function onNativeMessage(message) {
 
 
 function onMessageExternal(message) {
-  bugout.log('Message received from External:' + message);
+  bugout.log('Message received from External:' + JSON.stringify(message));
   if (message.action === 'pay') {
     if (!message.amount || !message.paymentMethod) {
       connection.postMessage({
