@@ -300,23 +300,28 @@ function request_nf(job, should_print = false, emit = true) {
     timeout: 0
   }, ).done(function(event, xhr, settings) {
     // TODO: logging
-    if (event[0].status == 'aprovado' && event[0].uuid) {
+    if (event[0].uuid && (event[0].status == 'aprovado' || event[0].status == 'processamento' || event[0].status == 'contingencia')) {
       job.url = event[0].url_danfe;
+      job.status = event[0].status
       if (should_print)
         nf_html_get(job);
+    } else if (event[0].status == 'cancelado' || event[0].status == 'reprovado') {
+      job.status = event[0].status;
     } else {
-      // TODO: o que fazer quando a nota não emitir
+      // TODO: o que fazer quando a nota nem chegar a ter um status?
     }
   }).fail(function(evt) {
     // TODO: logging
     try {
       var obj = JSON.parse(evt.responseText.substr(evt.responseText.indexOf('['), evt.responseText.lastIndexOf(']')));
-      if (obj[0].status == 'aprovado' && obj[0].uuid) {
+      if (obj[0].uuid && (obj[0].status == 'aprovado' || obj[0].status == 'processamento' || obj[0].status == 'contingencia')) {
         job.url = obj[0].url_danfe;
         if (should_print)
           nf_html_get(job);
+      } else if (obj[0].status == 'cancelado' || obj[0].status == 'reprovado') {
+        job.status = event[0].status;
       } else {
-        // TODO: o que fazer quando a nota não emitir
+        // TODO: o que fazer quando a nota nem chegar a ter um status?
       }
     } catch (e) {
       // TODO: Logging
@@ -369,7 +374,9 @@ function qz_config() {
       txt = '<button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_receipt(' + notas[i].id + ')" type="button">Recibo</button>';
       if (notas[i].url)
         txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-nf" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Imprimir NFC-e</button>';
-      if (!notas[i].url)
+      else if (notas.status)
+        txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-nf" type="button">Nota ' + notas[i].status + '</button>';
+      else
         txt += ' - <button class="button button-primary wp-button-large alignright manual-print-order-receipt" onclick="manual_print_nf(' + notas[i].id + ')" type="button">Emitir NFC-e</button>';
       btn.innerHTML = txt;
       row.insertCell(3).innerHTML = btn.outerHTML;
