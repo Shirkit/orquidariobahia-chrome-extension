@@ -64,6 +64,8 @@ def update():
                     copyTree(source, dest)
                     shutil.rmtree('/master/')
                     os.remove('./master.zip')
+                    return True
 
     except Exception as e:
         print(e)
+    return False

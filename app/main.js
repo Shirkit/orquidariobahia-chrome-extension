@@ -59,6 +59,10 @@ function onMessage(message) {
         displayMessageToUser(message.message, 'error', true);
         break;
 
+      case 'update':
+        displayMessageToUser(message.message, 'warning', true);
+        break;
+
       case 'pay_ok':
         is_processing = false;
         blocker.unblock();
@@ -138,6 +142,55 @@ function blockOrWaitBlock() {
 }
 
 function init() {
+
+  if (location.search.indexOf('wc_pip_action=print') > 0) {
+    document.querySelector('a.woocommerce-pip-print').onclick = null;
+    document.querySelector('#woocommerce-pip a.woocommerce-pip-print').addEventListener('click', function() {
+      qz_connect().then(function() {
+
+        var printer = JSON.parse(localStorage.getItem('qz_selected_printer'));
+        var options = {};
+        var config = qz.configs.create(printer, options);
+        var data = [],
+          pedidos = [];
+        var body = document.querySelector('body');
+        var btn = document.querySelector('a.woocommerce-pip-print');
+
+        if (document.querySelector('body').classList.contains('packing-list')) {
+          pedidos = document.querySelectorAll('body > div.container');
+          pedidos.forEach(function(pedido) {
+            body.removeChild(pedido);
+          });
+          body.removeChild(btn);
+          for (var i = 0; i < pedidos.length; i++) {
+            body.appendChild(pedidos[i]);
+            data.push({
+              type: 'html',
+              format: 'plain',
+              data: document.documentElement.outerHTML
+            });
+            body.removeChild(pedidos[i]);
+          }
+          qz.print(config, data);
+          body.appendChild(btn);
+          for (var i = 0; i < pedidos.length; i++) {
+            body.appendChild(pedidos[i]);
+          }
+        } else if (document.querySelector('body').classList.contains('pick-list')) {
+          body.removeChild(btn);
+          data.push({
+            type: 'html',
+            format: 'plain',
+            data: document.documentElement.outerHTML
+          });
+          qz.print(config, data);
+          body.appendChild(btn);
+        }
+      });
+    });
+
+    return;
+  }
 
   var arr = document.querySelectorAll('.payment_method_pos_chip_pin .pos_chip_pin_order_id, .payment_method_pos_chip_pin2 .pos_chip_pin_order_id');
   for (var i = 0; i < arr.length; i++) {
