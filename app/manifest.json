@@ -1,6 +1,6 @@
 {
   "name": "Orquidario Bahia Helper App",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "manifest_version": 2,
   "description": "Send and parses messages from the Orquidario Bahia compainion app.",
   "content_scripts": [
@@ -10,7 +10,8 @@
         "*://*.orquidariobahia.com.br/point-of-sale/*",
         "*://orquidariobahia.com.br/point-of-sale/*",
         "*://shirkit.local/wordpress/point-of-sale/*",
-        "*://orquidariobahia.com.br/wp-admin/edit*wc_pip_action=print"
+        "*://orquidariobahia.com.br/wp-admin/*wc_pip_action=print*",
+        "*://*.orquidariobahia.com.br/wp-admin/*wc_pip_action=print*"
       ],
       "js": ["content.js"],
       "run_at":"document_end"

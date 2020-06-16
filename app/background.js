@@ -12,7 +12,7 @@ function onNativeMessage(message) {
   } else {
     message = JSON.parse(message);
     switch (message.result) {
-      case :"-107":
+      case "-107":
         response.response = 'update';
         response.message = orquidario_messages['update'];
         break;

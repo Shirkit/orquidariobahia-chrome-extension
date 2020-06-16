@@ -12,6 +12,7 @@ function sendPayMessage(method) {
 
   message.action = 'pay';
   message.amount = document.querySelector('#modal-order_payment .topaytop .amount').innerText.toString();
+  message.installment = document.querySelector('#installment_wrapper #installments').value;
   message.paymentMethod = method;
 
   port.postMessage(message);
@@ -141,6 +142,21 @@ function blockOrWaitBlock() {
   }, 100);
 }
 
+function change_installment(val) {
+  var el = document.querySelector('#installment_wrapper #installments');
+  el.value = (parseInt(el.value) + val);
+  if (el.value < 1)
+    el.value = "1";
+  else if (el.value > 12)
+    el.value = "12";
+  document.querySelector('#installment_wrapper #install_total').innerText = Number(CART.total / el.value).toFixed(2);
+  if ((CART.total / el.value) < 50 && el.value > 1) {
+    document.querySelector('#installment_wrapper #big_text_wrapper').style.color = "red";
+  } else {
+    document.querySelector('#installment_wrapper #big_text_wrapper').style.color = "";
+  }
+}
+
 function init() {
 
   if (location.search.indexOf('wc_pip_action=print') > 0) {
@@ -192,10 +208,22 @@ function init() {
     return;
   }
 
+  var el = document.querySelector('.payment_method_pos_chip_pin .pos_chip_pin_order_id');
+  var wrapper = document.createElement('div');
+  wrapper.innerHTML = '<div id="installment_wrapper"><input id="minus_installment" type="button" class="button" value="-"><div id="big_text_wrapper"><input id="installments" type="number" min="1" max="12" readonly="true" value="1"><div id="text_wrapper"><span>parcelas de R$</span><span id="install_total">50,05</span></div></div><input id="plus_installment" type="button" class="button" value="+"></div>';
+  el.parentElement.insertBefore(wrapper.firstChild, el.parentElement.querySelector('p'));
+
+  document.querySelector('#installment_wrapper #minus_installment').addEventListener('click', function() {
+    change_installment(-1);
+  });
+  document.querySelector('#installment_wrapper #plus_installment').addEventListener('click', function() {
+    change_installment(1);
+  });
+
   var arr = document.querySelectorAll('.payment_method_pos_chip_pin .pos_chip_pin_order_id, .payment_method_pos_chip_pin2 .pos_chip_pin_order_id');
   for (var i = 0; i < arr.length; i++) {
-    var el = arr[i];
-    var wrapper = document.createElement('div');
+    el = arr[i];
+    wrapper = document.createElement('div');
     wrapper.innerHTML = '<input name="" type="button" class="try_again-chip-pin" value="Tentar novamente">';
     el.parentElement.insertBefore(wrapper.firstChild, null);
   }
@@ -241,6 +269,8 @@ function init() {
     } else {
       document.querySelector('.payment_method_pos_chip_pin2 .try_again-chip-pin').style.display = 'none';
     }
+
+    change_installment(0);
   });
 
   document.querySelector('#modal-order_payment .payment_method_pos_chip_pin .pos_chip_pin_order_id div.pos_chip_pin_order_generate a').addEventListener(
