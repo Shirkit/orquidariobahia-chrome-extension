@@ -180,14 +180,19 @@ function init() {
           body.removeChild(btn);
           for (var i = 0; i < pedidos.length; i++) {
             body.appendChild(pedidos[i]);
-            data.push({
+            data.push([{
               type: 'html',
               format: 'plain',
               data: document.documentElement.outerHTML
-            });
+            }]);
             body.removeChild(pedidos[i]);
           }
-          qz.print(config, data);
+          try {
+            qz.print(config, data);
+          } catch (e) {
+            alert("Erro ao imprimir, favor tentar novamente.");
+            console.error(e);
+          }
           body.appendChild(btn);
           for (var i = 0; i < pedidos.length; i++) {
             body.appendChild(pedidos[i]);
@@ -317,7 +322,6 @@ function init() {
           try {
             var obj = JSON.parse(xhr.responseText.substr(xhr.responseText.indexOf('['), xhr.responseText.lastIndexOf(']')));
             if (obj.status == 'completed') {
-              debugger;
               var o = {
                 id: obj.id,
                 total: obj.total,
