@@ -204,7 +204,12 @@ function init() {
             format: 'plain',
             data: document.documentElement.outerHTML
           });
-          qz.print(config, data);
+          try {
+            qz.print(config, data);
+          } catch (e) {
+            alert("Erro ao imprimir, favor tentar novamente.");
+            console.error(e);
+          }
           body.appendChild(btn);
         }
       });
