@@ -1,6 +1,6 @@
 {
   "name": "Orquidario Bahia Helper App",
-  "version": "0.4.3",
+  "version": "0.5.2",
   "manifest_version": 2,
   "description": "Send and parses messages from the Orquidario Bahia compainion app.",
   "content_scripts": [
@@ -25,15 +25,15 @@
       "*://shirkit.local/wordpress/point-of-sale/*"
     ]
   },
-  "web_accessible_resources": ["main.js", "node_modules/qz-tray/qz-tray-v2.1.js", "deps/rsvp-3.1.0.min.js", "deps/sha-256.min.js"],
-  "background": {
-    "scripts": ["node_modules/debugout.js/debugout.js", "background.js", "messages.js"],
-    "persistent": false
-  },
+  "web_accessible_resources": ["injected.js", "node_modules/qz-tray/qz-tray-v2.1.js", "deps/rsvp-3.1.0.min.js", "deps/sha-256.min.js"],
   "icons": {
     "128": "icon.png"
   },
   "permissions": [
-    "nativeMessaging", "background"
-  ]
+    "activeTab", "storage"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+}
 }
