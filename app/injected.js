@@ -1,5 +1,5 @@
-var print_queue = []
-var currently_printing = []
+//var print_queue = []
+//var currently_printing = []
 var notas = []
 var printer = ""
 
@@ -9,6 +9,48 @@ function receiveMessage(event) {
 }
 
 function init() {
+
+  setTimeout(qz_connect, 200);
+
+  if (location.search.indexOf('wc_pip_action=print') > 0) {
+    document.querySelector('a.woocommerce-pip-print').onclick = null;
+    document.querySelector('#woocommerce-pip a.woocommerce-pip-print').addEventListener('click', function() {
+      var data = [],
+        pedidos = [];
+      var body = document.querySelector('body');
+      var btn = document.querySelector('a.woocommerce-pip-print');
+
+      if (document.querySelector('body').classList.contains('packing-list')) {
+        pedidos = document.querySelectorAll('body > div.container');
+        pedidos.forEach(function(pedido) {
+          body.removeChild(pedido);
+        });
+        body.removeChild(btn);
+        for (var i = 0; i < pedidos.length; i++) {
+          body.appendChild(pedidos[i]);
+          data.push(
+            { html: document.documentElement.outerHTML }
+          );
+          body.removeChild(pedidos[i]);
+        }
+        body.appendChild(btn);
+        for (var i = 0; i < pedidos.length; i++) {
+          body.appendChild(pedidos[i]);
+        }
+        for (var i = 0; i < data.length; i++)
+          qz_print(data[i]);
+
+      } else if (document.querySelector('body').classList.contains('pick-list')) {
+        body.removeChild(btn);
+        var job = {
+          html: document.documentElement.outerHTML
+        }
+        body.appendChild(btn);
+        qz_print(job);
+      }
+    });
+    return;
+  }
 
   /* Listen to XHR callbacks */
   var open = window.XMLHttpRequest.prototype.open,
@@ -28,14 +70,14 @@ function init() {
   }
 
   function onReadyStateChangeReplacement() {
-    if (this.readyState == 4 && this._url && this._url.includes('wp-json/wc/v3/pos_orders/')) {
+    if (this.readyState == 4 && this._url && this._url.includes('wp-json/wc-pos/orders/')) {
       try {
         var json = JSON.parse(this.response)
         if (json.status == 'processing' && json.created_via == 'POS') {
           var o = {
             id: json.id
           }
-          print_queue.push(o)
+          //print_queue.push(o)
           notas[json.id] = o
           request_nf(o, true, true)
         }
@@ -99,7 +141,7 @@ function manual_print_nf() {
       var job = {
         id : n
       }
-      print_queue.push(job)
+      //print_queue.push(job)
       notas[n] = job
       request_nf(job, true, true)
     }
@@ -134,7 +176,10 @@ function request_nf(job, should_print = false, emit = true) {
       if (Array.isArray(responseJSON))
         responseJSON = responseJSON[0]
       if (responseJSON && responseJSON.uuid && (responseJSON.status == 'aprovado' || responseJSON.status == 'processamento' || responseJSON.status == 'contingencia')) {
-        job.url = responseJSON.url_danfe.replace('http:', 'https:')
+		if (responseJSON.danfe)
+			job.url = responseJSON.danfe.replace('http:', 'https:')
+		else if (responseJSON.url_danfe)
+			job.url = responseJSON.url_danfe.replace('http:', 'https:')
         job.status = responseJSON.status
         if (should_print)
           nf_html_get(job)
@@ -183,22 +228,17 @@ function qz_print(job) {
   var options = {}
   var config = qz.configs.create(printer, options)
   var data = [{
-    type: 'html',
-    format: 'plain',
+    type: 'pixel',
+    format: 'html',
+    flavor: 'plain',
     data: job.html
   }]
-
-  currently_printing.push(job)
-  print_queue.splice(print_queue.indexOf(job), 1)
 
   // return the promise so we can chain more .then().then().catch(), etc.
   return qz_connect().then(function() {
     qz.print(config, data).catch(function(e) {
-      print_queue.unshift(job)
-      currently_printing.splice(currently_printing.indexOf(job), 1)
       console.error(e)
     }).then(function(e) {
-      currently_printing.splice(currently_printing.indexOf(job), 1)
     })
   })
 }
