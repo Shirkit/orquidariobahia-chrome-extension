@@ -75,7 +75,8 @@ function init() {
         var json = JSON.parse(this.response)
         if (json.status == 'processing' && json.created_via == 'POS') {
           var o = {
-            id: json.id
+            id: json.id,
+            copies: 2
           }
           //print_queue.push(o)
           notas[json.id] = o
@@ -127,7 +128,7 @@ function init() {
 }
 
 function manual_print_nf() {
-  var s = document.querySelector('.q-dialog.fullscreen.no-pointer-events .q-dialog__inner div.row.q-card__section .text-body1').textContent.trim().replace('#','')
+  var s = document.querySelector('.q-dialog.fullscreen.no-pointer-events .q-dialog__inner div.row > div.text-body1').textContent.trim().replace('#','')
   var n = Number.parseInt(s)
   if (!isNaN(n)) {
     if (notas[n]) {
@@ -226,6 +227,8 @@ function qz_connect() {
 
 function qz_print(job) {
   var options = {}
+  if (job.printerOptions)
+    options = job.printerOptions
   var config = qz.configs.create(printer, options)
   var data = [{
     type: 'pixel',
@@ -236,10 +239,12 @@ function qz_print(job) {
 
   // return the promise so we can chain more .then().then().catch(), etc.
   return qz_connect().then(function() {
-    qz.print(config, data).catch(function(e) {
-      console.error(e)
-    }).then(function(e) {
-    })
+    for (var i = 0; i < (job.copies ? job.copies : 1); i++) {
+      qz.print(config, data).catch(function(e) {
+        console.error(e)
+      }).then(function(e) {
+      })
+    }
   })
 }
 
